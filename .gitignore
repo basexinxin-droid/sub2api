@@ -55,6 +55,14 @@ pnpm-debug.log*
 docker-compose.override.yml
 
 # ===================
+# 运行时数据目录（本地部署映射）
+# ===================
+postgres_data/
+redis_data/
+data/
+docker-compose.yml
+
+# ===================
 # IDE / 编辑器
 # ===================
 .idea/
