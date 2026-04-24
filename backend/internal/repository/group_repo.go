@@ -608,7 +608,15 @@ func (r *groupRepository) DeleteCascade(ctx context.Context, id int64) ([]int64,
 		return nil, err
 	}
 
-	// 5. Soft-delete group itself.
+	// 5. Clear fallback references from other groups pointing to this group.
+	if _, err := exec.ExecContext(ctx, "UPDATE groups SET fallback_group_id = NULL WHERE fallback_group_id = $1 AND deleted_at IS NULL", id); err != nil {
+		return nil, err
+	}
+	if _, err := exec.ExecContext(ctx, "UPDATE groups SET fallback_group_id_on_invalid_request = NULL WHERE fallback_group_id_on_invalid_request = $1 AND deleted_at IS NULL", id); err != nil {
+		return nil, err
+	}
+
+	// 6. Soft-delete group itself.
 	if _, err := txClient.Group.Delete().Where(group.IDEQ(id)).Exec(ctx); err != nil {
 		return nil, err
 	}
